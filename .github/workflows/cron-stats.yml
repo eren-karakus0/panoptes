@@ -1,0 +1,21 @@
+name: "Cron: Network Stats"
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: cron-stats
+  cancel-in-progress: false
+
+jobs:
+  stats:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Trigger stats aggregation
+        run: |
+          curl -sf -X POST "${{ secrets.APP_URL }}/api/cron/stats" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"

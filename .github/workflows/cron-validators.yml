@@ -1,0 +1,33 @@
+name: "Cron: Sync Validators"
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: cron-validators
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx prisma generate
+
+      - run: npx tsx scripts/sync-validators.ts
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          REPUBLIC_RPC_URL: ${{ vars.REPUBLIC_RPC_URL || 'https://rpc.republicai.io' }}
+          REPUBLIC_REST_URL: ${{ vars.REPUBLIC_REST_URL || 'https://rest.republicai.io' }}

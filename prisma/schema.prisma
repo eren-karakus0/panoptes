@@ -7,9 +7,79 @@ datasource db {
   provider = "postgresql"
 }
 
-// Phase 1'de eklenecek modeller:
-// - Validator
-// - ValidatorSnapshot
-// - Endpoint
-// - EndpointHealth
-// - NetworkStats
+model Validator {
+  id               String              @id // operatorAddress
+  moniker          String
+  status           String
+  tokens           String
+  commission       Float
+  jailed           Boolean             @default(false)
+  uptime           Float               @default(0)
+  votingPower      String
+  missedBlocks     Int                 @default(0)
+  jailCount        Int                 @default(0)
+  lastJailedAt     DateTime?
+  firstSeen        DateTime            @default(now())
+  lastUpdated      DateTime            @updatedAt
+  snapshots        ValidatorSnapshot[]
+
+  @@index([status])
+  @@index([jailed])
+}
+
+model ValidatorSnapshot {
+  id          String    @id @default(cuid())
+  validatorId String
+  validator   Validator @relation(fields: [validatorId], references: [id], onDelete: Cascade)
+  tokens      String
+  status      String
+  commission  Float
+  jailed      Boolean
+  votingPower String
+  timestamp   DateTime  @default(now())
+
+  @@index([validatorId, timestamp])
+  @@index([timestamp])
+}
+
+model Endpoint {
+  id           String           @id @default(cuid())
+  url          String           @unique
+  type         String
+  provider     String?
+  isOfficial   Boolean          @default(false)
+  isActive     Boolean          @default(true)
+  createdAt    DateTime         @default(now())
+  healthChecks EndpointHealth[]
+
+  @@index([type])
+  @@index([isActive])
+}
+
+model EndpointHealth {
+  id          String   @id @default(cuid())
+  endpointId  String
+  endpoint    Endpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  latencyMs   Int
+  statusCode  Int
+  isHealthy   Boolean
+  blockHeight BigInt?
+  error       String?
+  timestamp   DateTime @default(now())
+
+  @@index([endpointId, timestamp])
+  @@index([timestamp])
+}
+
+model NetworkStats {
+  id               String   @id @default(cuid())
+  totalValidators  Int
+  activeValidators Int
+  totalStaked      String
+  bondedRatio      Float?
+  blockHeight      BigInt
+  avgBlockTime     Float?
+  timestamp        DateTime @default(now())
+
+  @@index([timestamp])
+}

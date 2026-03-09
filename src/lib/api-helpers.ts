@@ -1,0 +1,46 @@
+import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, rateLimitHeaders } from "@/lib/rate-limit";
+
+export function getClientIp(request: NextRequest): string {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown"
+  );
+}
+
+export function withRateLimit(
+  request: NextRequest,
+): { response: NextResponse } | { headers: Record<string, string> } {
+  const ip = getClientIp(request);
+  const limit = checkRateLimit(ip);
+  const headers = rateLimitHeaders(limit);
+
+  if (!limit.allowed) {
+    return {
+      response: NextResponse.json(
+        { error: "Too many requests" },
+        { status: 429, headers },
+      ),
+    };
+  }
+
+  return { headers };
+}
+
+export function jsonResponse(
+  data: unknown,
+  headers: Record<string, string>,
+  status = 200,
+): NextResponse {
+  return NextResponse.json(data, { status, headers });
+}
+
+/** Convert BigInt fields to string for JSON serialization */
+export function serializeBigInt<T>(obj: T): T {
+  return JSON.parse(
+    JSON.stringify(obj, (_key, value) =>
+      typeof value === "bigint" ? value.toString() : value,
+    ),
+  ) as T;
+}

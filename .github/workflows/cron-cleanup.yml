@@ -1,0 +1,21 @@
+name: "Cron: Data Cleanup"
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: cron-cleanup
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Trigger data cleanup
+        run: |
+          curl -sf -X POST "${{ secrets.APP_URL }}/api/cron/cleanup" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"
