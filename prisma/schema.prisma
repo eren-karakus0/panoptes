@@ -1,0 +1,15 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Phase 1'de eklenecek modeller:
+// - Validator
+// - ValidatorSnapshot
+// - Endpoint
+// - EndpointHealth
+// - NetworkStats
