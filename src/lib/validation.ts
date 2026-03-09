@@ -5,8 +5,8 @@ export function parseIntParam(
   max: number,
 ): number {
   if (!value) return defaultValue;
-  const parsed = parseInt(value, 10);
-  if (isNaN(parsed)) return defaultValue;
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed)) return defaultValue;
   return Math.min(Math.max(parsed, min), max);
 }
 
