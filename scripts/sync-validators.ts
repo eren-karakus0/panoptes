@@ -102,11 +102,14 @@ async function syncValidators(
 async function main() {
   console.log("[sync-validators] Starting...");
 
-  const hour = new Date().getUTCHours();
-  const forceDailySnapshot = hour === 0;
+  const now = new Date();
+  const hour = now.getUTCHours();
+  const minute = now.getUTCMinutes();
+  // Only trigger daily snapshot in the first 5-min window (00:00-00:04 UTC)
+  const forceDailySnapshot = hour === 0 && minute < 5;
 
   if (forceDailySnapshot) {
-    console.log("[sync-validators] Daily snapshot mode (00:xx UTC)");
+    console.log("[sync-validators] Daily snapshot mode (00:00 UTC)");
   }
 
   try {
