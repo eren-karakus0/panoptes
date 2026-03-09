@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { withRateLimit, jsonResponse, serializeBigInt } from "@/lib/api-helpers";
 
-function formatStats(s: {
+interface StatsRow {
   totalValidators: number;
   activeValidators: number;
   totalStaked: string;
@@ -10,7 +10,9 @@ function formatStats(s: {
   blockHeight: bigint;
   avgBlockTime: number | null;
   timestamp: Date;
-}) {
+}
+
+function formatStats(s: StatsRow) {
   return {
     totalValidators: s.totalValidators,
     activeValidators: s.activeValidators,
@@ -30,18 +32,24 @@ export async function GET(request: NextRequest) {
     orderBy: { timestamp: "desc" },
   });
 
+  // Daily aggregate: one record per day (last entry of each day) for 90 days
+  // Uses Prisma raw query to GROUP BY date and pick max timestamp per day
   const ninetyDaysAgo = new Date();
   ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
-  const history = await prisma.networkStats.findMany({
-    where: { timestamp: { gte: ninetyDaysAgo } },
-    orderBy: { timestamp: "asc" },
-  });
+  const dailyHistory: StatsRow[] = await prisma.$queryRaw`
+    SELECT DISTINCT ON (DATE("timestamp"))
+      "totalValidators", "activeValidators", "totalStaked",
+      "bondedRatio", "blockHeight", "avgBlockTime", "timestamp"
+    FROM "NetworkStats"
+    WHERE "timestamp" >= ${ninetyDaysAgo}
+    ORDER BY DATE("timestamp") ASC, "timestamp" DESC
+  `;
 
   return jsonResponse(
     serializeBigInt({
       current: current ? formatStats(current) : null,
-      history: history.map(formatStats),
+      history: dailyHistory.map(formatStats),
     }),
     rl.headers,
   );
