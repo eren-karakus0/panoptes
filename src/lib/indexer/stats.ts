@@ -26,23 +26,24 @@ export async function aggregateStats(): Promise<{
       }),
     ]);
 
-    // Sum tokens for bonded ratio
-    const tokenSum: Array<{ total: bigint | null }> = await prisma.$queryRaw`
-      SELECT COALESCE(SUM(CAST(tokens AS NUMERIC)), 0)::BIGINT as total
+    // Sum tokens for bonded ratio — use TEXT to avoid bigint overflow
+    const tokenSum: Array<{ total: string }> = await prisma.$queryRaw`
+      SELECT COALESCE(SUM(CAST(tokens AS NUMERIC)), 0)::TEXT as total
       FROM "Validator"
       WHERE status = 'BOND_STATUS_BONDED'
     `;
-    const totalStaked = (tokenSum[0]?.total ?? BigInt(0)).toString();
+    const totalStaked = tokenSum[0]?.total ?? "0";
 
     // Bonded ratio: bonded tokens / all tokens
-    const allTokenSum: Array<{ total: bigint | null }> = await prisma.$queryRaw`
-      SELECT COALESCE(SUM(CAST(tokens AS NUMERIC)), 0)::BIGINT as total
+    const allTokenSum: Array<{ total: string }> = await prisma.$queryRaw`
+      SELECT COALESCE(SUM(CAST(tokens AS NUMERIC)), 0)::TEXT as total
       FROM "Validator"
     `;
-    const allTokens = allTokenSum[0]?.total ?? BigInt(0);
+    const bondedStaked = BigInt(totalStaked);
+    const allTokens = BigInt(allTokenSum[0]?.total ?? "0");
     const bondedRatio =
-      allTokens > BigInt(0)
-        ? Number(tokenSum[0]?.total ?? BigInt(0)) / Number(allTokens)
+      allTokens > 0n
+        ? Number((bondedStaked * 10000n) / allTokens) / 10000
         : null;
 
     // Avg block time from last 2 stats
