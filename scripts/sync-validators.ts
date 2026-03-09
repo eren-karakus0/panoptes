@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import "dotenv/config";
 import { prisma } from "./db.js";
 import { RepublicClient, REPUBLIC_TESTNET } from "republic-sdk";
