@@ -43,8 +43,8 @@ describe("aggregateStats", () => {
       .mockResolvedValueOnce(30); // active (bonded)
 
     mockPrisma.$queryRaw
-      .mockResolvedValueOnce([{ total: BigInt(1000000) }]) // bonded tokens
-      .mockResolvedValueOnce([{ total: BigInt(2000000) }]); // all tokens
+      .mockResolvedValueOnce([{ total: "1000000" }]) // bonded tokens (TEXT)
+      .mockResolvedValueOnce([{ total: "2000000" }]); // all tokens (TEXT)
 
     mockPrisma.networkStats.findMany.mockResolvedValue([]);
     mockPrisma.networkStats.create.mockResolvedValue({});
@@ -93,8 +93,8 @@ describe("aggregateStats", () => {
   it("handles zero total tokens gracefully", async () => {
     mockPrisma.$queryRaw
       .mockReset()
-      .mockResolvedValueOnce([{ total: BigInt(0) }])
-      .mockResolvedValueOnce([{ total: BigInt(0) }]);
+      .mockResolvedValueOnce([{ total: "0" }])
+      .mockResolvedValueOnce([{ total: "0" }]);
 
     const result = await aggregateStats();
 
