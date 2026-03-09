@@ -30,6 +30,14 @@ describe("parseIntParam", () => {
   it("returns default for empty string", () => {
     expect(parseIntParam("", 10, 1, 100)).toBe(10);
   });
+
+  it("rejects trailing non-numeric characters", () => {
+    expect(parseIntParam("10abc", 10, 1, 100)).toBe(10);
+  });
+
+  it("rejects float strings", () => {
+    expect(parseIntParam("10.5", 10, 1, 100)).toBe(10);
+  });
 });
 
 describe("parseStringParam", () => {
