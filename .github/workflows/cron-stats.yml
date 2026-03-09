@@ -13,14 +13,8 @@ jobs:
   stats:
     runs-on: ubuntu-latest
     timeout-minutes: 1
+    if: ${{ vars.CRONS_ENABLED == 'true' }}
     steps:
-      - name: Validate secrets
-        run: |
-          if [ -z "${{ secrets.APP_URL }}" ] || [ -z "${{ secrets.CRON_SECRET }}" ]; then
-            echo "::error::APP_URL or CRON_SECRET secret is not configured. Skipping."
-            exit 1
-          fi
-
       - name: Trigger stats aggregation
         run: |
           curl -sf -X POST "${{ secrets.APP_URL }}/api/cron/stats" \

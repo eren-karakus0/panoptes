@@ -13,14 +13,8 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     timeout-minutes: 3
+    if: ${{ vars.CRONS_ENABLED == 'true' }}
     steps:
-      - name: Validate secrets
-        run: |
-          if [ -z "${{ secrets.DATABASE_URL }}" ]; then
-            echo "::error::DATABASE_URL secret is not configured. Skipping."
-            exit 1
-          fi
-
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
