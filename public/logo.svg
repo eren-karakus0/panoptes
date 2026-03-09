@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="panoptes-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4C1D95"/>
+      <stop offset="100%" stop-color="#8B5CF6"/>
+    </linearGradient>
+  </defs>
+  <!-- Outer eye shape -->
+  <path d="M60 20C30 20 10 60 10 60s20 40 50 40 50-40 50-40S90 20 60 20z" fill="url(#panoptes-grad)" opacity="0.15"/>
+  <!-- Inner eye ring -->
+  <circle cx="60" cy="60" r="28" stroke="url(#panoptes-grad)" stroke-width="3" fill="none"/>
+  <!-- Iris -->
+  <circle cx="60" cy="60" r="16" fill="url(#panoptes-grad)" opacity="0.85"/>
+  <!-- Pupil -->
+  <circle cx="60" cy="60" r="7" fill="#1C0F2B"/>
+  <!-- Light reflection -->
+  <circle cx="54" cy="54" r="3" fill="white" opacity="0.6"/>
+  <!-- P letterform integrated as highlight arc -->
+  <path d="M52 40v40M52 40h10a12 12 0 010 24H52" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.9"/>
+</svg>

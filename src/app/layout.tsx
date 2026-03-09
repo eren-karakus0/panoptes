@@ -31,6 +31,9 @@ export const metadata: Metadata = {
   description:
     "Chain intelligence platform for Republic AI ecosystem. Validator monitoring, endpoint health tracking, and smart routing engine.",
   keywords: ["Republic AI", "validator", "monitoring", "blockchain", "cosmos"],
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
