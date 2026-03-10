@@ -21,19 +21,29 @@ export default function OGImage() {
           fontFamily: "sans-serif",
         }}
       >
-        {/* Eye icon */}
+        {/* Prism icon */}
         <svg
-          width="80"
-          height="80"
-          viewBox="0 0 24 24"
+          width="100"
+          height="100"
+          viewBox="0 0 120 120"
           fill="none"
-          stroke="#8B5CF6"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
         >
-          <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
-          <circle cx="12" cy="12" r="3" />
+          <circle cx="60" cy="57" r="45" fill="rgba(139,92,246,0.15)" />
+          <line x1="60" y1="4" x2="60" y2="30" stroke="rgba(196,181,253,0.8)" strokeWidth="2" strokeLinecap="round" />
+          <path d="M60 28L88 44L88 70L60 86L32 70L32 44Z" fill="url(#og-pg)" />
+          <path d="M60 28L88 44L60 57Z" fill="white" opacity="0.08" />
+          <path d="M60 28L32 44L60 57Z" fill="white" opacity="0.04" />
+          <circle cx="60" cy="57" r="6" fill="#1C0F2B" />
+          <circle cx="58" cy="55" r="1.8" fill="white" opacity="0.5" />
+          <line x1="46" y1="78" x2="22" y2="114" stroke="rgba(196,181,253,0.7)" strokeWidth="2" strokeLinecap="round" />
+          <line x1="60" y1="86" x2="60" y2="114" stroke="rgba(196,181,253,0.7)" strokeWidth="2" strokeLinecap="round" />
+          <line x1="74" y1="78" x2="98" y2="114" stroke="rgba(196,181,253,0.7)" strokeWidth="2" strokeLinecap="round" />
+          <defs>
+            <linearGradient id="og-pg" x1="32" y1="28" x2="88" y2="86" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#4C1D95" />
+              <stop offset="1" stopColor="#8B5CF6" />
+            </linearGradient>
+          </defs>
         </svg>
 
         <div

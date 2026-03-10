@@ -11,9 +11,9 @@ import {
   AlertTriangle,
   Menu,
   X,
-  Eye,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PrismIcon } from "@/components/icons/prism-icon";
 
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
@@ -36,7 +36,7 @@ export function Sidebar() {
     <>
       <div className="flex items-center gap-2.5 px-6 py-5">
         <div className="flex size-8 items-center justify-center rounded-lg bg-soft-violet/20">
-          <Eye className="size-4 text-soft-violet" />
+          <PrismIcon className="size-4 text-soft-violet" />
         </div>
         <h2 className="font-display text-lg font-bold text-soft-violet">
           Panoptes
@@ -92,7 +92,7 @@ export function Sidebar() {
           <Menu className="size-5" />
         </button>
         <div className="flex items-center gap-2">
-          <Eye className="size-4 text-soft-violet" />
+          <PrismIcon className="size-4 text-soft-violet" />
           <span className="font-display text-sm font-bold text-soft-violet">
             Panoptes
           </span>
