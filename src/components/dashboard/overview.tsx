@@ -1,14 +1,22 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useNetworkStats } from "@/hooks/use-stats";
 import { useEndpoints } from "@/hooks/use-endpoints";
 import { useAnomalies } from "@/hooks/use-anomalies";
 import { StatCard } from "./stat-card";
 import { ErrorState } from "./error-state";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { StakingTrendChart } from "@/components/charts/staking-trend-chart";
-import { BlockHeightChart } from "@/components/charts/block-height-chart";
 import { StatusBadge } from "./status-badge";
+
+const StakingTrendChart = dynamic(
+  () => import("@/components/charts/staking-trend-chart").then((m) => m.StakingTrendChart),
+  { ssr: false }
+);
+const BlockHeightChart = dynamic(
+  () => import("@/components/charts/block-height-chart").then((m) => m.BlockHeightChart),
+  { ssr: false }
+);
 import {
   formatTokensShort,
   formatBlockHeight,

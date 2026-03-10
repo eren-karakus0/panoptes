@@ -1,9 +1,24 @@
+import dynamic from "next/dynamic";
 import { Hero } from "@/components/landing/hero";
-import { Features } from "@/components/landing/features";
-import { NetworkStats } from "@/components/landing/network-stats";
-import { HowItWorks } from "@/components/landing/how-it-works";
-import { ApiTeaser } from "@/components/landing/api-teaser";
 import { CallToAction } from "@/components/landing/cta";
+
+const Features = dynamic(
+  () => import("@/components/landing/features").then((m) => m.Features),
+  { ssr: true }
+);
+const NetworkStats = dynamic(
+  () =>
+    import("@/components/landing/network-stats").then((m) => m.NetworkStats),
+  { ssr: true }
+);
+const HowItWorks = dynamic(
+  () => import("@/components/landing/how-it-works").then((m) => m.HowItWorks),
+  { ssr: true }
+);
+const ApiTeaser = dynamic(
+  () => import("@/components/landing/api-teaser").then((m) => m.ApiTeaser),
+  { ssr: true }
+);
 
 export default function Home() {
   return (
