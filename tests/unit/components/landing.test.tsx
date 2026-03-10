@@ -11,7 +11,7 @@ vi.mock("motion/react", () => ({
         const Component = React.forwardRef(
           (props: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { variants: _v, initial: _i, animate: _a, custom: _c, whileHover: _wh, whileTap: _wt, ...rest } = props;
+            const { variants: _v, initial: _i, animate: _a, custom: _c, whileHover: _wh, whileTap: _wt, style: _s, ...rest } = props;
             return React.createElement(prop, { ...rest, ref });
           }
         );
@@ -28,6 +28,14 @@ vi.mock("motion/react", () => ({
   }),
   useSpring: () => ({
     on: () => vi.fn(),
+  }),
+  useReducedMotion: () => false,
+  useScroll: () => ({
+    scrollYProgress: { on: vi.fn(), get: () => 0 },
+  }),
+  useTransform: () => ({
+    on: vi.fn(),
+    get: () => 0,
   }),
 }));
 

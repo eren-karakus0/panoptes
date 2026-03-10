@@ -7,13 +7,16 @@ import { CallToAction } from "@/components/landing/cta";
 
 export default function Home() {
   return (
-    <main className="min-h-screen">
-      <Hero />
-      <Features />
-      <NetworkStats />
-      <HowItWorks />
-      <ApiTeaser />
-      <CallToAction />
+    <main className="relative min-h-screen bg-midnight-plum">
+      <div className="landing-gradient-glow pointer-events-none fixed inset-0" />
+      <div className="relative">
+        <Hero />
+        <Features />
+        <NetworkStats />
+        <HowItWorks />
+        <ApiTeaser />
+        <CallToAction />
+      </div>
     </main>
   );
 }
