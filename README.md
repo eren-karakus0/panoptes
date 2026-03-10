@@ -5,13 +5,14 @@
 Chain intelligence platform for the Republic AI ecosystem.
 Validator monitoring, endpoint health tracking, and smart routing engine.
 
-## Features (Planned)
+## Features
 
-- Real-time validator monitoring (1200+ validators)
-- Endpoint health scoring and smart routing
-- Pre-flight transaction validation
-- Network analytics dashboard
-- Historical data and trend analysis
+- Real-time validator monitoring and historical snapshots
+- Endpoint health tracking with uptime/latency stats
+- Network statistics with bonded ratio and block time trends
+- Smart endpoint routing (best endpoint by latency)
+- REST API with rate limiting, caching, and security headers
+- Interactive dashboard with charts and filtering
 
 ## Tech Stack
 

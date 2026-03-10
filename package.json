@@ -1,6 +1,6 @@
 {
   "name": "panoptes",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Chain Intelligence Platform for Republic AI",
   "scripts": {
@@ -47,6 +47,7 @@
     "@types/react-dom": "^19",
     "@types/ws": "^8.18.1",
     "@vitejs/plugin-react": "^5.1.4",
+    "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "jsdom": "^28.1.0",

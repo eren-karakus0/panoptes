@@ -3,8 +3,8 @@ import { checkRateLimit, rateLimitHeaders } from "@/lib/rate-limit";
 
 export function getClientIp(request: NextRequest): string {
   return (
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     request.headers.get("x-real-ip") ||
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     "unknown"
   );
 }
@@ -32,8 +32,16 @@ export function jsonResponse(
   data: unknown,
   headers: Record<string, string>,
   status = 200,
+  options?: { cache?: boolean },
 ): NextResponse {
-  return NextResponse.json(data, { status, headers });
+  const allHeaders =
+    options?.cache !== false
+      ? {
+          ...headers,
+          "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
+        }
+      : headers;
+  return NextResponse.json(data, { status, headers: allHeaders });
 }
 
 /** Convert BigInt fields to string for JSON serialization */

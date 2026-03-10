@@ -1,5 +1,7 @@
 import { RATE_LIMIT } from "@/lib/constants";
 
+const MAX_ENTRIES = 10_000;
+
 interface RateLimitEntry {
   count: number;
   resetAt: number;
@@ -16,11 +18,23 @@ function ensureCleanup() {
     for (const [key, entry] of store) {
       if (entry.resetAt < now) store.delete(key);
     }
-  }, RATE_LIMIT.CLEANUP_INTERVAL);
+  }, 60_000);
   // Allow process to exit
   if (typeof cleanupTimer === "object" && "unref" in cleanupTimer) {
     cleanupTimer.unref();
   }
+}
+
+function evictOldest() {
+  let oldestKey: string | null = null;
+  let oldestReset = Infinity;
+  for (const [key, entry] of store) {
+    if (entry.resetAt < oldestReset) {
+      oldestReset = entry.resetAt;
+      oldestKey = key;
+    }
+  }
+  if (oldestKey) store.delete(oldestKey);
 }
 
 export function checkRateLimit(ip: string): {
@@ -33,6 +47,9 @@ export function checkRateLimit(ip: string): {
   const entry = store.get(ip);
 
   if (!entry || entry.resetAt < now) {
+    if (!entry && store.size >= MAX_ENTRIES) {
+      evictOldest();
+    }
     const resetAt = now + RATE_LIMIT.WINDOW_MS;
     store.set(ip, { count: 1, resetAt });
     return {
