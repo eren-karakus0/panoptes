@@ -57,6 +57,7 @@ export default function AnomaliesPage() {
         <PageHeader
           title="Anomalies"
           description="Network anomaly detection and alerts"
+          breadcrumbs={[{ label: "Anomalies" }]}
         />
         <ErrorState message="Failed to load anomalies" onRetry={() => mutate()} />
       </div>

@@ -12,6 +12,7 @@ export default function EndpointsPage() {
       <PageHeader
         title="Endpoint Health"
         description="Monitor RPC, REST, and EVM-RPC endpoint availability and performance"
+        breadcrumbs={[{ label: "Endpoints" }]}
       />
       <EndpointsList />
     </div>
