@@ -1,6 +1,6 @@
 {
   "name": "panoptes",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "Chain Intelligence Platform for Republic AI",
   "scripts": {
@@ -27,6 +27,7 @@
     "date-fns": "^4.1.0",
     "dotenv": "^17.3.1",
     "lucide-react": "^0.577.0",
+    "motion": "^12.35.2",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",

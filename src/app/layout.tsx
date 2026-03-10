@@ -24,16 +24,57 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || "https://panoptes.republicai.io"
+  ),
   title: {
     default: "Panoptes - Chain Intelligence, Unblinking",
     template: "%s | Panoptes",
   },
   description:
-    "Chain intelligence platform for Republic AI ecosystem. Validator monitoring, endpoint health tracking, and smart routing engine.",
-  keywords: ["Republic AI", "validator", "monitoring", "blockchain", "cosmos"],
+    "Chain intelligence platform for Republic AI ecosystem. Validator monitoring, endpoint health tracking, smart routing, and anomaly detection.",
+  keywords: [
+    "Republic AI",
+    "validator",
+    "monitoring",
+    "blockchain",
+    "cosmos",
+    "chain intelligence",
+    "endpoint health",
+    "smart routing",
+    "anomaly detection",
+  ],
+  authors: [{ name: "eren-karakus0" }],
+  robots: { index: true, follow: true },
   icons: {
     icon: "/favicon.svg",
   },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    title: "Panoptes - Chain Intelligence, Unblinking",
+    description:
+      "Chain intelligence platform for Republic AI. Validator monitoring, endpoint health, smart routing, and anomaly detection.",
+    siteName: "Panoptes",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Panoptes - Chain Intelligence, Unblinking",
+    description:
+      "Chain intelligence platform for Republic AI. Validator monitoring, endpoint health, smart routing, and anomaly detection.",
+  },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Panoptes",
+  description:
+    "Chain intelligence platform for Republic AI ecosystem. Validator monitoring, endpoint health tracking, smart routing, and anomaly detection.",
+  applicationCategory: "Blockchain Tool",
+  operatingSystem: "Web",
+  author: { "@type": "Person", name: "eren-karakus0" },
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
 };
 
 export default function RootLayout({
@@ -43,6 +84,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={cn("font-sans", geist.variable)}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body
         className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable} font-body antialiased`}
       >
