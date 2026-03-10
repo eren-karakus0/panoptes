@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || "*";
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://panoptes.republicai.io";
 
 const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
