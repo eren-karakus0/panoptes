@@ -48,6 +48,10 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
   icons: {
     icon: "/favicon.svg",
+    apple: "/apple-icon",
+  },
+  other: {
+    "theme-color": "#1C0F2B",
   },
   openGraph: {
     type: "website",
