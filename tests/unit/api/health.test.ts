@@ -14,13 +14,15 @@ vi.mock("@/lib/republic", () => ({
   getRepublicClient: vi.fn(),
 }));
 
-vi.mock("@/lib/api-helpers", () => ({
-  withRateLimit: vi.fn(() => ({ headers: { "X-RateLimit-Limit": "60" } })),
-  jsonResponse: vi.fn((data, headers, status = 200) => {
-    const { NextResponse } = require("next/server");
-    return NextResponse.json(data, { status, headers });
-  }),
-}));
+vi.mock("@/lib/api-helpers", async () => {
+  const { NextResponse } = await import("next/server");
+  return {
+    withRateLimit: vi.fn(() => ({ headers: { "X-RateLimit-Limit": "60" } })),
+    jsonResponse: vi.fn((data: unknown, headers: Record<string, string>, status = 200) =>
+      NextResponse.json(data, { status, headers }),
+    ),
+  };
+});
 
 import { prisma } from "@/lib/db";
 import { getRepublicClient } from "@/lib/republic";

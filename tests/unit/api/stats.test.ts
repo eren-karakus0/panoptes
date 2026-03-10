@@ -10,20 +10,22 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-vi.mock("@/lib/api-helpers", () => ({
-  withRateLimit: vi.fn(() => ({ headers: { "X-RateLimit-Limit": "60" } })),
-  jsonResponse: vi.fn((data, headers, status = 200) => {
-    const { NextResponse } = require("next/server");
-    return NextResponse.json(data, { status, headers });
-  }),
-  serializeBigInt: vi.fn((obj) =>
-    JSON.parse(
-      JSON.stringify(obj, (_: string, v: unknown) =>
-        typeof v === "bigint" ? v.toString() : v,
+vi.mock("@/lib/api-helpers", async () => {
+  const { NextResponse } = await import("next/server");
+  return {
+    withRateLimit: vi.fn(() => ({ headers: { "X-RateLimit-Limit": "60" } })),
+    jsonResponse: vi.fn((data: unknown, headers: Record<string, string>, status = 200) =>
+      NextResponse.json(data, { status, headers }),
+    ),
+    serializeBigInt: vi.fn((obj: unknown) =>
+      JSON.parse(
+        JSON.stringify(obj, (_: string, v: unknown) =>
+          typeof v === "bigint" ? v.toString() : v,
+        ),
       ),
     ),
-  ),
-}));
+  };
+});
 
 import { prisma } from "@/lib/db";
 
