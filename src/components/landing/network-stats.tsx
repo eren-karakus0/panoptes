@@ -79,13 +79,16 @@ export function NetworkStats() {
   ];
 
   return (
-    <section className="bg-slate-dark px-4 py-24 md:py-32">
-      <div className="mx-auto max-w-6xl">
-        <ScrollReveal>
-          <h2 className="text-center font-display text-3xl font-bold text-slate-light md:text-4xl">
+    <section className="bg-[#1a1230] px-4 py-24 md:py-32">
+      {/* Section separator */}
+      <div className="h-px bg-gradient-to-r from-transparent via-soft-violet/20 to-transparent" />
+
+      <div className="mx-auto max-w-6xl pt-8">
+        <ScrollReveal margin="-120px">
+          <h2 className="text-center font-display text-3xl font-bold text-dusty-lavender md:text-4xl">
             Live Network Data
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-center text-mist/70">
+          <p className="mx-auto mt-4 max-w-2xl text-center text-dusty-lavender/70">
             Real-time metrics from the Republic AI chain.
           </p>
         </ScrollReveal>
@@ -98,21 +101,22 @@ export function NetworkStats() {
 
         <ScrollReveal
           stagger
+          margin="-120px"
           className="mt-16 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4"
         >
           {items.map((item) => (
             <motion.div
               key={item.label}
               variants={staggerItem}
-              className="rounded-xl border border-slate-DEFAULT/30 bg-slate-dark/50 p-6 text-center"
+              className="group rounded-xl border border-soft-violet/20 bg-deep-iris/10 p-6 text-center backdrop-blur-sm transition-all hover:border-soft-violet/30 hover:bg-deep-iris/15"
             >
-              <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-slate-DEFAULT/20">
-                <item.icon className="size-6 text-slate-light" />
+              <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-soft-violet/15 transition-transform group-hover:scale-110">
+                <item.icon className="size-6 text-soft-violet" />
               </div>
-              <p className="mt-4 text-sm text-mist/70">{item.label}</p>
-              <p className="mt-2 font-display text-3xl font-bold text-slate-light">
+              <p className="mt-4 text-sm text-dusty-lavender/70">{item.label}</p>
+              <p className="mt-2 font-display text-3xl font-bold text-dusty-lavender">
                 {isLoading || item.value === undefined ? (
-                  <span className="inline-block h-9 w-20 animate-pulse rounded bg-slate-DEFAULT/20" />
+                  <span className="inline-block h-9 w-20 animate-pulse rounded bg-deep-iris/20" />
                 ) : (
                   <>
                     <CountUp value={item.value} decimals={item.decimals} />

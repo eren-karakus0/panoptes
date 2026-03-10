@@ -4,11 +4,19 @@ import { useRef, type ReactNode } from "react";
 import { motion, useInView } from "motion/react";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 
+type UseInViewMargin = `${number}${"px" | "%"}`;
+type MarginType =
+  | UseInViewMargin
+  | `${UseInViewMargin} ${UseInViewMargin}`
+  | `${UseInViewMargin} ${UseInViewMargin} ${UseInViewMargin}`
+  | `${UseInViewMargin} ${UseInViewMargin} ${UseInViewMargin} ${UseInViewMargin}`;
+
 interface ScrollRevealProps {
   children: ReactNode;
   className?: string;
   delay?: number;
   stagger?: boolean;
+  margin?: MarginType;
 }
 
 export function ScrollReveal({
@@ -16,9 +24,10 @@ export function ScrollReveal({
   className,
   delay = 0,
   stagger = false,
+  margin = "-80px",
 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const isInView = useInView(ref, { once: true, margin });
 
   if (stagger) {
     return (
