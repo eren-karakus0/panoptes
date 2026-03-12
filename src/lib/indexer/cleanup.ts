@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { RETENTION } from "@/lib/constants";
+import { RETENTION, OUTBOX_RETENTION } from "@/lib/constants";
 import { IndexerError } from "@/lib/errors";
 
 export async function cleanupOldData(): Promise<{
@@ -9,6 +9,7 @@ export async function cleanupOldData(): Promise<{
   deletedScores: number;
   deletedValidatorScores: number;
   deletedAnomalies: number;
+  deletedOutboxEvents: number;
   duration: number;
 }> {
   const start = Date.now();
@@ -31,8 +32,9 @@ export async function cleanupOldData(): Promise<{
 
     const scoreCutoff = new Date(Date.now() - 7 * 86400000);
     const anomalyCutoff = new Date(Date.now() - 30 * 86400000);
+    const outboxCutoff = new Date(Date.now() - OUTBOX_RETENTION.HOURS * 3600_000);
 
-    const [snapshots, healthChecks, stats, scores, vScores, anomalies] = await prisma.$transaction([
+    const [snapshots, healthChecks, stats, scores, vScores, anomalies, outboxEvents] = await prisma.$transaction([
       prisma.validatorSnapshot.deleteMany({
         where: { timestamp: { lt: snapshotCutoff } },
       }),
@@ -51,6 +53,9 @@ export async function cleanupOldData(): Promise<{
       prisma.anomaly.deleteMany({
         where: { resolved: true, resolvedAt: { lt: anomalyCutoff } },
       }),
+      prisma.outboxEvent.deleteMany({
+        where: { createdAt: { lt: outboxCutoff } },
+      }),
     ]);
 
     return {
@@ -60,6 +65,7 @@ export async function cleanupOldData(): Promise<{
       deletedScores: scores.count,
       deletedValidatorScores: vScores.count,
       deletedAnomalies: anomalies.count,
+      deletedOutboxEvents: outboxEvents.count,
       duration: Date.now() - start,
     };
   } catch (error) {

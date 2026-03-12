@@ -1,6 +1,12 @@
 import { prisma } from "@/lib/db";
 import { ANOMALY_THRESHOLDS } from "@/lib/constants";
 import type { AnomalySeverity } from "@/types";
+import { publishEvents } from "@/lib/events/publish";
+import {
+  CHANNELS,
+  ANOMALY_CREATE_EVENT_MAP,
+  ANOMALY_RESOLVE_EVENT_MAP,
+} from "@/lib/events/event-types";
 
 interface DetectionResult {
   detected: number;
@@ -39,6 +45,23 @@ async function createOrSkipAnomaly(params: {
     },
   });
 
+  const eventTypes = ANOMALY_CREATE_EVENT_MAP[params.type] ?? ["anomaly.created"];
+  await publishEvents(
+    eventTypes.map((type) => ({
+      channel: CHANNELS.ANOMALY,
+      type,
+      payload: {
+        anomalyType: params.type,
+        severity: params.severity,
+        entityType: params.entityType,
+        entityId: params.entityId,
+        title: params.title,
+        description: params.description,
+        metadata: params.metadata ?? null,
+      },
+    })),
+  );
+
   return true;
 }
 
@@ -54,6 +77,18 @@ async function resolveAnomalies(type: string, entityId: string | null): Promise<
       resolvedAt: new Date(),
     },
   });
+
+  if (result.count > 0) {
+    const eventTypes = ANOMALY_RESOLVE_EVENT_MAP[type] ?? ["anomaly.resolved"];
+    await publishEvents(
+      eventTypes.map((evType) => ({
+        channel: CHANNELS.ANOMALY,
+        type: evType,
+        payload: { anomalyType: type, entityId, resolvedCount: result.count },
+      })),
+    );
+  }
+
   return result.count;
 }
 

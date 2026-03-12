@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import { getRepublicClient } from "@/lib/republic";
 import { IndexerError } from "@/lib/errors";
+import { publishEvent } from "@/lib/events/publish";
+import { CHANNELS } from "@/lib/events/event-types";
 
 export async function aggregateStats(): Promise<{
   blockHeight: string;
@@ -69,6 +71,19 @@ export async function aggregateStats(): Promise<{
         totalStaked,
         bondedRatio,
         blockHeight,
+        avgBlockTime,
+      },
+    });
+
+    await publishEvent({
+      channel: CHANNELS.NETWORK,
+      type: "stats.updated",
+      payload: {
+        blockHeight: blockHeight.toString(),
+        totalValidators,
+        activeValidators,
+        totalStaked,
+        bondedRatio,
         avgBlockTime,
       },
     });

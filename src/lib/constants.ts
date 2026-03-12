@@ -114,3 +114,14 @@ export const WEBHOOK_DEFAULTS = {
   MAX_EVENTS: 20,
   SECRET_PREFIX: "whsec_",
 } as const;
+
+export const STREAM_DEFAULTS = {
+  POLL_INTERVAL_MS: 3_000,
+  HEARTBEAT_MS: 15_000,
+  BATCH_SIZE: 50,
+  TOKEN_TTL_SECONDS: 300,
+} as const;
+
+export const OUTBOX_RETENTION = {
+  HOURS: 24,
+} as const;

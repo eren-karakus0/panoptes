@@ -9,8 +9,14 @@ vi.mock("@/lib/db", () => ({
       create: vi.fn(),
       updateMany: vi.fn(),
     },
+    outboxEvent: { create: vi.fn().mockResolvedValue({ seq: 1 }) },
     $queryRaw: vi.fn(),
   },
+}));
+
+vi.mock("@/lib/events/publish", () => ({
+  publishEvent: vi.fn().mockResolvedValue(1),
+  publishEvents: vi.fn().mockResolvedValue(undefined),
 }));
 
 import { prisma } from "@/lib/db";

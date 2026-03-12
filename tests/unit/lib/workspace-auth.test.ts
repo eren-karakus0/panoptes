@@ -13,6 +13,7 @@ import { prisma } from "@/lib/db";
 import {
   hashToken,
   extractBearerToken,
+  extractApiKey,
   authenticateWorkspace,
   requireWorkspace,
 } from "@/lib/workspace-auth";
@@ -74,6 +75,34 @@ describe("extractBearerToken", () => {
   });
 });
 
+describe("extractApiKey", () => {
+  it("extracts key from x-api-key header", () => {
+    const req = new NextRequest("http://localhost/api/test", {
+      headers: { "x-api-key": "ws_my-api-key" },
+    });
+    expect(extractApiKey(req)).toBe("ws_my-api-key");
+  });
+
+  it("returns null when no x-api-key header", () => {
+    const req = new NextRequest("http://localhost/api/test");
+    expect(extractApiKey(req)).toBeNull();
+  });
+
+  it("returns null for empty x-api-key value", () => {
+    const req = new NextRequest("http://localhost/api/test", {
+      headers: { "x-api-key": "  " },
+    });
+    expect(extractApiKey(req)).toBeNull();
+  });
+
+  it("trims whitespace from key", () => {
+    const req = new NextRequest("http://localhost/api/test", {
+      headers: { "x-api-key": "  ws_my-key  " },
+    });
+    expect(extractApiKey(req)).toBe("ws_my-key");
+  });
+});
+
 describe("authenticateWorkspace", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -130,6 +159,16 @@ describe("authenticateWorkspace", () => {
 
     const result = await authenticateWorkspace(req);
     expect(result).toBeNull();
+  });
+
+  it("does not fall back to x-api-key (Bearer only)", async () => {
+    const req = new NextRequest("http://localhost/api/test", {
+      headers: { "x-api-key": TEST_TOKEN },
+    });
+
+    const result = await authenticateWorkspace(req);
+    expect(result).toBeNull();
+    expect(prisma.workspace.findFirst).not.toHaveBeenCalled();
   });
 
   it("queries with hashed token and isActive filter", async () => {

@@ -19,6 +19,11 @@ vi.mock("@/lib/republic", () => ({
   })),
 }));
 
+vi.mock("@/lib/events/publish", () => ({
+  publishEvent: vi.fn().mockResolvedValue(1),
+  publishEvents: vi.fn().mockResolvedValue(undefined),
+}));
+
 import { aggregateStats } from "@/lib/indexer/stats";
 import { prisma } from "@/lib/db";
 import { getRepublicClient } from "@/lib/republic";
