@@ -13,7 +13,8 @@ interface SyncResult {
   duration: number;
 }
 
-const BATCH_SIZE = 50;
+const BATCH_SIZE = 25;
+const TX_TIMEOUT_MS = 15_000;
 
 export async function syncValidators(
   options: SyncOptions = {},
@@ -98,7 +99,7 @@ export async function syncValidators(
             snapshotsCreated++;
           }
         }
-      });
+      }, { timeout: TX_TIMEOUT_MS });
     }
 
     return {
