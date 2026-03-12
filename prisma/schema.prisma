@@ -136,13 +136,73 @@ model Anomaly {
 }
 
 model Workspace {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   name           String
-  slug           String   @unique
-  adminTokenHash String   @unique
-  isActive       Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  slug           String    @unique
+  adminTokenHash String    @unique
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  webhooks       Webhook[]
 
   @@index([slug])
+}
+
+model Webhook {
+  id              String            @id @default(cuid())
+  workspaceId     String
+  workspace       Workspace         @relation(fields: [workspaceId], references: [id])
+  name            String
+  url             String
+  secretEncrypted String
+  events          String[]
+  isActive        Boolean           @default(true)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  deliveries      WebhookDelivery[]
+
+  @@index([workspaceId])
+  @@index([isActive])
+}
+
+model WebhookDelivery {
+  id            String    @id @default(cuid())
+  webhookId     String
+  webhook       Webhook   @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+  outboxEventId String
+  eventType     String
+  payload       String
+  statusCode    Int?
+  responseBody  String?
+  success       Boolean   @default(false)
+  attempts      Int       @default(0)
+  maxAttempts   Int       @default(5)
+  nextRetryAt   DateTime?
+  deliveredAt   DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@unique([webhookId, outboxEventId])
+  @@index([webhookId, createdAt])
+  @@index([success, nextRetryAt])
+}
+
+model OutboxEvent {
+  id          String   @id @default(cuid())
+  seq         Int      @default(autoincrement())
+  channel     String
+  type        String
+  visibility  String   @default("public")
+  workspaceId String?
+  payload     String
+  createdAt   DateTime @default(now())
+
+  @@index([seq])
+  @@index([channel, seq])
+  @@index([workspaceId, seq])
+}
+
+model WebhookCursor {
+  id        String   @id @default("singleton")
+  lastSeq   Int      @default(0)
+  updatedAt DateTime @updatedAt
 }

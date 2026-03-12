@@ -95,3 +95,22 @@ export const PREFLIGHT = {
   DEFAULT_GAS_LIMIT: 200_000,
   TIMEOUT_MS: 10_000,
 } as const;
+
+export const WEBHOOK_EVENTS = [
+  "anomaly.created",
+  "anomaly.resolved",
+  "validator.jailed",
+  "validator.unjailed",
+  "validator.status_changed",
+  "endpoint.down",
+  "endpoint.recovered",
+  "stats.updated",
+] as const;
+
+export type WebhookEventType = (typeof WEBHOOK_EVENTS)[number];
+
+export const WEBHOOK_DEFAULTS = {
+  MAX_PER_WORKSPACE: 10,
+  MAX_EVENTS: 20,
+  SECRET_PREFIX: "whsec_",
+} as const;
