@@ -108,6 +108,9 @@ export const WEBHOOK_EVENTS = [
   "slo.breached",
   "slo.budget_exhausted",
   "slo.recovered",
+  "incident.created",
+  "incident.acknowledged",
+  "incident.resolved",
 ] as const;
 
 export type WebhookEventType = (typeof WEBHOOK_EVENTS)[number];
@@ -147,6 +150,24 @@ export const SLO_DEFAULTS = {
 
 export const SLO_RETENTION = {
   EVALUATION_DAYS: 90,
+} as const;
+
+export const INCIDENT_STATUSES = ["open", "acknowledged", "resolved"] as const;
+export type IncidentStatus = (typeof INCIDENT_STATUSES)[number];
+
+export const INCIDENT_EVENT_TYPES = [
+  "created", "slo_linked", "anomaly_linked",
+  "acknowledged", "resolved", "comment",
+] as const;
+export type IncidentEventType = (typeof INCIDENT_EVENT_TYPES)[number];
+
+export const INCIDENT_DEFAULTS = {
+  MAX_OPEN_PER_WORKSPACE: 100,
+  CORRELATION_WINDOW_HOURS: 1,
+} as const;
+
+export const INCIDENT_RETENTION = {
+  RESOLVED_DAYS: 90,
 } as const;
 
 export const STREAM_DEFAULTS = {

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { RETENTION, OUTBOX_RETENTION, DELIVERY_RETENTION, SLO_RETENTION } from "@/lib/constants";
+import { RETENTION, OUTBOX_RETENTION, DELIVERY_RETENTION, SLO_RETENTION, INCIDENT_RETENTION } from "@/lib/constants";
 import { IndexerError } from "@/lib/errors";
 
 export async function cleanupOldData(): Promise<{
@@ -12,6 +12,7 @@ export async function cleanupOldData(): Promise<{
   deletedOutboxEvents: number;
   deletedDeliveries: number;
   deletedSloEvaluations: number;
+  deletedIncidents: number;
   duration: number;
 }> {
   const start = Date.now();
@@ -38,8 +39,9 @@ export async function cleanupOldData(): Promise<{
     const deliverySuccessCutoff = new Date(Date.now() - DELIVERY_RETENTION.SUCCESS_DAYS * 86400_000);
     const deliveryFailureCutoff = new Date(Date.now() - DELIVERY_RETENTION.FAILURE_DAYS * 86400_000);
     const sloEvalCutoff = new Date(Date.now() - SLO_RETENTION.EVALUATION_DAYS * 86400_000);
+    const incidentCutoff = new Date(Date.now() - INCIDENT_RETENTION.RESOLVED_DAYS * 86400_000);
 
-    const [snapshots, healthChecks, stats, scores, vScores, anomalies, outboxEvents, deliveriesSuccess, deliveriesFailure, sloEvaluations] = await prisma.$transaction([
+    const [snapshots, healthChecks, stats, scores, vScores, anomalies, outboxEvents, deliveriesSuccess, deliveriesFailure, sloEvaluations, incidents] = await prisma.$transaction([
       prisma.validatorSnapshot.deleteMany({
         where: { timestamp: { lt: snapshotCutoff } },
       }),
@@ -70,6 +72,9 @@ export async function cleanupOldData(): Promise<{
       prisma.sloEvaluation.deleteMany({
         where: { evaluatedAt: { lt: sloEvalCutoff } },
       }),
+      prisma.incident.deleteMany({
+        where: { status: "resolved", resolvedAt: { lt: incidentCutoff } },
+      }),
     ]);
 
     return {
@@ -82,6 +87,7 @@ export async function cleanupOldData(): Promise<{
       deletedOutboxEvents: outboxEvents.count,
       deletedDeliveries: deliveriesSuccess.count + deliveriesFailure.count,
       deletedSloEvaluations: sloEvaluations.count,
+      deletedIncidents: incidents.count,
       duration: Date.now() - start,
     };
   } catch (error) {

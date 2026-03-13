@@ -46,6 +46,7 @@ vi.mock("@/lib/intelligence", () => ({
     skipped: 0,
     duration: 100,
   }),
+  correlateIncidents: vi.fn().mockResolvedValue({ created: 0, linked: 0, resolved: 0, duration: 10 }),
 }));
 
 import { prisma } from "@/lib/db";

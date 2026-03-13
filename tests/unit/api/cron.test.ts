@@ -24,6 +24,7 @@ vi.mock("@/lib/intelligence", () => ({
   computeValidatorScores: vi.fn().mockResolvedValue({ scored: 5, duration: 200 }),
   detectAnomalies: vi.fn().mockResolvedValue({ detected: 0, resolved: 0, duration: 50 }),
   evaluateSlos: vi.fn().mockResolvedValue({ evaluated: 2, breached: 0, recovered: 0, exhausted: 0, skipped: 0, duration: 80 }),
+  correlateIncidents: vi.fn().mockResolvedValue({ created: 1, linked: 0, resolved: 0, duration: 50 }),
 }));
 
 import { validateCronAuth } from "@/lib/cron-auth";
@@ -121,6 +122,8 @@ describe("Cron Routes", () => {
       expect(body.success).toBe(true);
       expect(body.slos).toBeDefined();
       expect(body.slos.evaluated).toBe(2);
+      expect(body.incidents).toBeDefined();
+      expect(body.incidents.created).toBe(1);
     });
 
     it("returns 500 on error", async () => {

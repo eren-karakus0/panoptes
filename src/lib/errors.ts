@@ -1,7 +1,7 @@
 export class IndexerError extends Error {
   constructor(
     message: string,
-    public readonly source: "validators" | "endpoints" | "stats" | "cleanup" | "slo",
+    public readonly source: "validators" | "endpoints" | "stats" | "cleanup" | "slo" | "incident",
   ) {
     super(message);
     this.name = "IndexerError";

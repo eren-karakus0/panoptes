@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateCronAuth } from "@/lib/cron-auth";
 import { withRateLimit } from "@/lib/api-helpers";
 import { aggregateStats } from "@/lib/indexer";
-import { computeEndpointScores, computeValidatorScores, detectAnomalies, evaluateSlos } from "@/lib/intelligence";
+import { computeEndpointScores, computeValidatorScores, detectAnomalies, evaluateSlos, correlateIncidents } from "@/lib/intelligence";
 
 export async function POST(request: NextRequest) {
   const authError = validateCronAuth(request);
@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
     ]);
 
     const sloResults = await evaluateSlos();
+    const incidentResults = await correlateIncidents();
 
     return NextResponse.json({
       success: true,
@@ -38,6 +39,11 @@ export async function POST(request: NextRequest) {
         breached: sloResults.breached,
         recovered: sloResults.recovered,
         exhausted: sloResults.exhausted,
+      },
+      incidents: {
+        created: incidentResults.created,
+        linked: incidentResults.linked,
+        resolved: incidentResults.resolved,
       },
     });
   } catch (error) {

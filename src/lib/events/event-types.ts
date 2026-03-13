@@ -5,6 +5,7 @@ export const CHANNELS = {
   ANOMALY: "anomaly",
   WORKSPACE: "workspace",
   SLO: "slo",
+  INCIDENT: "incident",
 } as const;
 
 export type Channel = (typeof CHANNELS)[keyof typeof CHANNELS];

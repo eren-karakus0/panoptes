@@ -14,6 +14,9 @@ export type AnomalyType = "jailing" | "large_stake_change" | "commission_spike" 
 export type AnomalySeverity = "low" | "medium" | "high" | "critical";
 export type AnomalyEntityType = "validator" | "endpoint" | "network";
 
+export type IncidentStatus = "open" | "acknowledged" | "resolved";
+export type IncidentEventType = "created" | "slo_linked" | "anomaly_linked" | "acknowledged" | "resolved" | "comment";
+
 export interface EndpointScoreItem {
   score: number;
   uptime: number;
