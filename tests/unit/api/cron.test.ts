@@ -23,6 +23,7 @@ vi.mock("@/lib/intelligence", () => ({
   computeEndpointScores: vi.fn().mockResolvedValue({ scored: 3, duration: 100 }),
   computeValidatorScores: vi.fn().mockResolvedValue({ scored: 5, duration: 200 }),
   detectAnomalies: vi.fn().mockResolvedValue({ detected: 0, resolved: 0, duration: 50 }),
+  evaluateSlos: vi.fn().mockResolvedValue({ evaluated: 2, breached: 0, recovered: 0, exhausted: 0, skipped: 0, duration: 80 }),
 }));
 
 import { validateCronAuth } from "@/lib/cron-auth";
@@ -106,7 +107,7 @@ describe("Cron Routes", () => {
   });
 
   describe("POST /api/cron/stats", () => {
-    it("returns success on aggregateStats", async () => {
+    it("returns success on aggregateStats with slos", async () => {
       vi.mocked(aggregateStats).mockResolvedValue({
         totalValidators: 50,
         activeValidators: 40,
@@ -118,6 +119,8 @@ describe("Cron Routes", () => {
       const body = await res.json();
 
       expect(body.success).toBe(true);
+      expect(body.slos).toBeDefined();
+      expect(body.slos.evaluated).toBe(2);
     });
 
     it("returns 500 on error", async () => {

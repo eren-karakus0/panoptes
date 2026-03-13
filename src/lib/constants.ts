@@ -105,6 +105,9 @@ export const WEBHOOK_EVENTS = [
   "endpoint.down",
   "endpoint.recovered",
   "stats.updated",
+  "slo.breached",
+  "slo.budget_exhausted",
+  "slo.recovered",
 ] as const;
 
 export type WebhookEventType = (typeof WEBHOOK_EVENTS)[number];
@@ -113,6 +116,37 @@ export const WEBHOOK_DEFAULTS = {
   MAX_PER_WORKSPACE: 10,
   MAX_EVENTS: 20,
   SECRET_PREFIX: "whsec_",
+} as const;
+
+export const SLO_INDICATORS = [
+  "uptime",
+  "latency",
+  "error_rate",
+  "block_production",
+] as const;
+
+export type SloIndicator = (typeof SLO_INDICATORS)[number];
+
+export const SLO_ENTITY_TYPES = ["endpoint", "validator"] as const;
+export type SloEntityType = (typeof SLO_ENTITY_TYPES)[number];
+
+export const SLO_INDICATOR_ENTITY_MAP: Record<SloIndicator, readonly SloEntityType[]> = {
+  uptime: ["endpoint"],
+  latency: ["endpoint"],
+  error_rate: ["endpoint"],
+  block_production: ["validator"],
+} as const;
+
+export const SLO_DEFAULTS = {
+  MAX_PER_WORKSPACE: 20,
+  MIN_TARGET: 0.9,
+  MAX_TARGET: 0.9999,
+  MIN_WINDOW_DAYS: 1,
+  MAX_WINDOW_DAYS: 7,
+} as const;
+
+export const SLO_RETENTION = {
+  EVALUATION_DAYS: 90,
 } as const;
 
 export const STREAM_DEFAULTS = {

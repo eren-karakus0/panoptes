@@ -144,6 +144,7 @@ model Workspace {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   webhooks       Webhook[]
+  slos           Slo[]
 
   @@index([slug])
 }
@@ -205,4 +206,44 @@ model WebhookCursor {
   id        String   @id @default("singleton")
   lastSeq   Int      @default(0)
   updatedAt DateTime @updatedAt
+}
+
+model Slo {
+  id              String          @id @default(cuid())
+  workspaceId     String
+  workspace       Workspace       @relation(fields: [workspaceId], references: [id])
+  name            String
+  indicator       String
+  entityType      String
+  entityId        String
+  target          Float
+  windowDays      Int
+  isActive        Boolean         @default(true)
+  isBreaching     Boolean         @default(false)
+  currentValue    Float?
+  budgetConsumed  Float?
+  burnRate        Float?
+  lastEvaluatedAt DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  evaluations     SloEvaluation[]
+
+  @@index([workspaceId])
+  @@index([isActive])
+  @@index([entityType, entityId])
+}
+
+model SloEvaluation {
+  id              String   @id @default(cuid())
+  sloId           String
+  slo             Slo      @relation(fields: [sloId], references: [id], onDelete: Cascade)
+  sliValue        Float
+  budgetConsumed  Float
+  budgetRemaining Float
+  burnRate        Float
+  isBreaching     Boolean
+  evaluatedAt     DateTime @default(now())
+
+  @@index([sloId, evaluatedAt])
+  @@index([evaluatedAt])
 }

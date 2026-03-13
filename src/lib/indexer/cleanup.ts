@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { RETENTION, OUTBOX_RETENTION, DELIVERY_RETENTION } from "@/lib/constants";
+import { RETENTION, OUTBOX_RETENTION, DELIVERY_RETENTION, SLO_RETENTION } from "@/lib/constants";
 import { IndexerError } from "@/lib/errors";
 
 export async function cleanupOldData(): Promise<{
@@ -11,6 +11,7 @@ export async function cleanupOldData(): Promise<{
   deletedAnomalies: number;
   deletedOutboxEvents: number;
   deletedDeliveries: number;
+  deletedSloEvaluations: number;
   duration: number;
 }> {
   const start = Date.now();
@@ -36,8 +37,9 @@ export async function cleanupOldData(): Promise<{
     const outboxCutoff = new Date(Date.now() - OUTBOX_RETENTION.HOURS * 3600_000);
     const deliverySuccessCutoff = new Date(Date.now() - DELIVERY_RETENTION.SUCCESS_DAYS * 86400_000);
     const deliveryFailureCutoff = new Date(Date.now() - DELIVERY_RETENTION.FAILURE_DAYS * 86400_000);
+    const sloEvalCutoff = new Date(Date.now() - SLO_RETENTION.EVALUATION_DAYS * 86400_000);
 
-    const [snapshots, healthChecks, stats, scores, vScores, anomalies, outboxEvents, deliveriesSuccess, deliveriesFailure] = await prisma.$transaction([
+    const [snapshots, healthChecks, stats, scores, vScores, anomalies, outboxEvents, deliveriesSuccess, deliveriesFailure, sloEvaluations] = await prisma.$transaction([
       prisma.validatorSnapshot.deleteMany({
         where: { timestamp: { lt: snapshotCutoff } },
       }),
@@ -65,6 +67,9 @@ export async function cleanupOldData(): Promise<{
       prisma.webhookDelivery.deleteMany({
         where: { success: false, nextRetryAt: null, createdAt: { lt: deliveryFailureCutoff } },
       }),
+      prisma.sloEvaluation.deleteMany({
+        where: { evaluatedAt: { lt: sloEvalCutoff } },
+      }),
     ]);
 
     return {
@@ -76,6 +81,7 @@ export async function cleanupOldData(): Promise<{
       deletedAnomalies: anomalies.count,
       deletedOutboxEvents: outboxEvents.count,
       deletedDeliveries: deliveriesSuccess.count + deliveriesFailure.count,
+      deletedSloEvaluations: sloEvaluations.count,
       duration: Date.now() - start,
     };
   } catch (error) {
