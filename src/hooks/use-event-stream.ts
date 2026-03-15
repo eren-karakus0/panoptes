@@ -17,6 +17,12 @@ export const DEFAULT_REVALIDATE_MAP: Record<string, string[]> = {
   "incident.created": ["/api/incidents/summary", "/api/incidents"],
   "incident.acknowledged": ["/api/incidents/summary", "/api/incidents"],
   "incident.resolved": ["/api/incidents/summary", "/api/incidents"],
+  "policy.triggered": ["/api/policies"],
+  "policy.action_executed": ["/api/policies"],
+  "governance.proposal_created": ["/api/governance"],
+  "governance.voting_started": ["/api/governance"],
+  "governance.voting_ended": ["/api/governance"],
+  "delegation.whale_detected": ["/api/delegations", "/api/anomalies"],
 };
 
 interface UseEventStreamOptions {
