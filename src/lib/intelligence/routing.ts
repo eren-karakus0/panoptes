@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { serializeBigInt } from "@/lib/api-helpers";
 import type { EndpointItem, EndpointScoreItem } from "@/types";
+import { getActiveExcludedEndpointIds } from "./remediation";
 
 type ScoredEndpoint = EndpointItem & { score: EndpointScoreItem | null };
 
@@ -19,7 +20,7 @@ function weightedRandomSelect(endpoints: ScoredEndpoint[]): ScoredEndpoint {
 
 export async function selectBestEndpoint(
   type: string,
-  options?: { excludeIds?: string[] },
+  options?: { excludeIds?: string[]; skipPolicyExclusions?: boolean },
 ): Promise<{
   endpoint: ScoredEndpoint | null;
   alternatives: ScoredEndpoint[];
@@ -27,11 +28,24 @@ export async function selectBestEndpoint(
 }> {
   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
+  // Merge explicit excludeIds with policy-based exclusions
+  let allExcludeIds = options?.excludeIds ?? [];
+  if (!options?.skipPolicyExclusions) {
+    try {
+      const policyExcluded = await getActiveExcludedEndpointIds();
+      if (policyExcluded.length > 0) {
+        allExcludeIds = [...new Set([...allExcludeIds, ...policyExcluded])];
+      }
+    } catch {
+      // Non-fatal: if remediation lookup fails, proceed without exclusions
+    }
+  }
+
   const endpoints = await prisma.endpoint.findMany({
     where: {
       isActive: true,
       type,
-      ...(options?.excludeIds?.length ? { id: { notIn: options.excludeIds } } : {}),
+      ...(allExcludeIds.length ? { id: { notIn: allExcludeIds } } : {}),
     },
     include: {
       healthChecks: {

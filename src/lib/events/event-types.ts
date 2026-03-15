@@ -6,6 +6,9 @@ export const CHANNELS = {
   WORKSPACE: "workspace",
   SLO: "slo",
   INCIDENT: "incident",
+  POLICY: "policy",
+  GOVERNANCE: "governance",
+  DELEGATION: "delegation",
 } as const;
 
 export type Channel = (typeof CHANNELS)[keyof typeof CHANNELS];
@@ -18,6 +21,7 @@ export const ANOMALY_CREATE_EVENT_MAP: Record<string, WebhookEventType[]> = {
   commission_spike: ["anomaly.created"],
   block_stale: ["anomaly.created"],
   mass_unbonding: ["anomaly.created"],
+  whale_movement: ["anomaly.created", "delegation.whale_detected"],
 };
 
 export const ANOMALY_RESOLVE_EVENT_MAP: Record<string, WebhookEventType[]> = {
@@ -27,6 +31,7 @@ export const ANOMALY_RESOLVE_EVENT_MAP: Record<string, WebhookEventType[]> = {
   commission_spike: ["anomaly.resolved"],
   block_stale: ["anomaly.resolved"],
   mass_unbonding: ["anomaly.resolved"],
+  whale_movement: ["anomaly.resolved"],
 };
 
 export interface PublishEventInput {

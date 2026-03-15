@@ -13,7 +13,7 @@ interface DetectionResult {
   resolved: number;
 }
 
-async function createOrSkipAnomaly(params: {
+export async function createOrSkipAnomaly(params: {
   type: string;
   severity: AnomalySeverity;
   entityType: string;

@@ -10,7 +10,7 @@ export type ValidatorStatus =
 export type PreflightStatus = "pass" | "warn" | "fail";
 
 // Intelligence Types
-export type AnomalyType = "jailing" | "large_stake_change" | "commission_spike" | "endpoint_down" | "block_stale" | "mass_unbonding";
+export type AnomalyType = "jailing" | "large_stake_change" | "commission_spike" | "endpoint_down" | "block_stale" | "mass_unbonding" | "whale_movement";
 export type AnomalySeverity = "low" | "medium" | "high" | "critical";
 export type AnomalyEntityType = "validator" | "endpoint" | "network";
 
@@ -32,6 +32,7 @@ export interface ValidatorScoreItem {
   jailPenalty: number;
   stakeStability: number;
   commissionScore: number;
+  governanceScore: number;
   timestamp: string;
 }
 
@@ -279,4 +280,85 @@ export interface WebhookDeliveryResponse {
   total: number;
   limit: number;
   offset: number;
+}
+
+// Policy Types
+export interface PolicyCondition {
+  field: string;
+  operator: "lt" | "gt" | "eq" | "neq" | "gte" | "lte" | "in";
+  value: number | string | boolean | string[];
+}
+
+export interface PolicyAction {
+  type: "webhook" | "routing_exclude" | "log" | "annotate" | "incident_create";
+  config?: Record<string, unknown>;
+}
+
+export interface PolicyItem {
+  id: string;
+  name: string;
+  description: string | null;
+  isActive: boolean;
+  dryRun: boolean;
+  priority: number;
+  conditions: PolicyCondition[];
+  actions: PolicyAction[];
+  cooldownMinutes: number;
+  lastTriggeredAt: string | null;
+  createdAt: string;
+}
+
+export interface PolicyExecutionItem {
+  id: string;
+  policyId: string;
+  triggerEntity: string;
+  conditionsMet: PolicyCondition[];
+  actionsTaken: PolicyAction[];
+  actionsResults: Record<string, unknown>[];
+  dryRun: boolean;
+  timestamp: string;
+}
+
+// Governance Types
+export interface GovernanceProposalItem {
+  id: string;
+  title: string;
+  description: string | null;
+  status: string;
+  proposer: string | null;
+  submitTime: string | null;
+  votingStartTime: string | null;
+  votingEndTime: string | null;
+  yesVotes: string;
+  noVotes: string;
+  abstainVotes: string;
+  vetoVotes: string;
+}
+
+export interface GovernanceVoteItem {
+  id: string;
+  proposalId: string;
+  voter: string;
+  option: string;
+  votedAt: string | null;
+}
+
+// Delegation Types
+export interface DelegationEventItem {
+  id: string;
+  type: "delegate" | "undelegate" | "redelegate";
+  delegator: string;
+  validatorFrom: string | null;
+  validatorTo: string;
+  amount: string;
+  timestamp: string;
+}
+
+export interface DelegationSnapshotItem {
+  id: string;
+  validatorId: string;
+  totalDelegators: number;
+  totalDelegated: string;
+  churnRate: number;
+  timestamp: string;
 }
