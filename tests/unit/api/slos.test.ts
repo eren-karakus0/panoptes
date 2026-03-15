@@ -47,6 +47,8 @@ vi.mock("@/lib/intelligence", () => ({
     duration: 100,
   }),
   correlateIncidents: vi.fn().mockResolvedValue({ created: 0, linked: 0, resolved: 0, duration: 10 }),
+  evaluatePolicies: vi.fn().mockResolvedValue({ evaluated: 0, triggered: 0, actionsExecuted: 0, rolledBack: 0, duration: 10 }),
+  detectWhaleMovement: vi.fn().mockResolvedValue({ detected: 0 }),
 }));
 
 import { prisma } from "@/lib/db";
@@ -467,6 +469,8 @@ describe("Stats cron SLO integration", () => {
         activeValidators: 40,
         blockHeight: 12345,
       }),
+      syncGovernance: vi.fn().mockResolvedValue({ proposalsSynced: 0, votesSynced: 0, duration: 10 }),
+      syncDelegations: vi.fn().mockResolvedValue({ eventsSynced: 0, snapshotsTaken: 0, duration: 10 }),
     }));
 
     const { POST } = await import("@/app/api/cron/stats/route");

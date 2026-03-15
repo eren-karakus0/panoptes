@@ -13,6 +13,8 @@ vi.mock("@/lib/indexer", () => ({
   checkEndpoints: vi.fn(),
   aggregateStats: vi.fn(),
   cleanupOldData: vi.fn(),
+  syncGovernance: vi.fn().mockResolvedValue({ proposalsSynced: 0, votesSynced: 0, duration: 10 }),
+  syncDelegations: vi.fn().mockResolvedValue({ eventsSynced: 0, snapshotsTaken: 0, duration: 10 }),
 }));
 
 vi.mock("@/lib/webhooks/dispatch", () => ({
@@ -25,6 +27,8 @@ vi.mock("@/lib/intelligence", () => ({
   detectAnomalies: vi.fn().mockResolvedValue({ detected: 0, resolved: 0, duration: 50 }),
   evaluateSlos: vi.fn().mockResolvedValue({ evaluated: 2, breached: 0, recovered: 0, exhausted: 0, skipped: 0, duration: 80 }),
   correlateIncidents: vi.fn().mockResolvedValue({ created: 1, linked: 0, resolved: 0, duration: 50 }),
+  evaluatePolicies: vi.fn().mockResolvedValue({ evaluated: 0, triggered: 0, actionsExecuted: 0, rolledBack: 0, duration: 10 }),
+  detectWhaleMovement: vi.fn().mockResolvedValue({ detected: 0 }),
 }));
 
 import { validateCronAuth } from "@/lib/cron-auth";

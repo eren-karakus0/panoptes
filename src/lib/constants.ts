@@ -72,10 +72,11 @@ export const SCORING = {
     errorRate: 0.15,
   },
   VALIDATOR_WEIGHTS: {
-    missedBlockRate: 0.45,
+    missedBlockRate: 0.40,
     jailPenalty: 0.25,
-    stakeStability: 0.15,
-    commissionScore: 0.15,
+    stakeStability: 0.10,
+    commissionScore: 0.10,
+    governanceScore: 0.15,
   },
   EMA_ALPHA: 0.3,
   LATENCY_BASELINE_MS: 200,
@@ -88,12 +89,23 @@ export const ANOMALY_THRESHOLDS = {
   ENDPOINT_DOWN_CONSECUTIVE: 3,
   BLOCK_STALE_BEHIND: 10,
   MASS_UNBONDING_PCT: 5,
+  WHALE_MOVEMENT_PCT: 1,
+  WHALE_CRITICAL_PCT: 5,
 } as const;
 
 export const PREFLIGHT = {
   MIN_GAS_BALANCE: "1000",
   DEFAULT_GAS_LIMIT: 200_000,
   TIMEOUT_MS: 10_000,
+} as const;
+
+export const WORKSPACE_DEFAULTS = {
+  MAX_WORKSPACES: 50,
+  NAME_MIN_LENGTH: 2,
+  NAME_MAX_LENGTH: 100,
+  SLUG_MIN_LENGTH: 2,
+  SLUG_MAX_LENGTH: 50,
+  SLUG_PATTERN: /^[a-z0-9][a-z0-9-]*[a-z0-9]$/,
 } as const;
 
 export const WEBHOOK_EVENTS = [
@@ -111,6 +123,12 @@ export const WEBHOOK_EVENTS = [
   "incident.created",
   "incident.acknowledged",
   "incident.resolved",
+  "policy.triggered",
+  "policy.action_executed",
+  "governance.proposal_created",
+  "governance.voting_started",
+  "governance.voting_ended",
+  "delegation.whale_detected",
 ] as const;
 
 export type WebhookEventType = (typeof WEBHOOK_EVENTS)[number];
@@ -194,4 +212,31 @@ export const WEBHOOK_DISPATCH = {
 export const DELIVERY_RETENTION = {
   SUCCESS_DAYS: 7,
   FAILURE_DAYS: 30,
+} as const;
+
+export const POLICY_DEFAULTS = {
+  MAX_PER_WORKSPACE: 20,
+  MIN_COOLDOWN_MINUTES: 1,
+  MAX_COOLDOWN_MINUTES: 1440,
+  MAX_CONDITIONS: 10,
+  MAX_ACTIONS: 5,
+} as const;
+
+export const REMEDIATION_DEFAULTS = {
+  MAX_ACTIONS_PER_HOUR: 10,
+  MIN_HEALTHY_ENDPOINTS: 2,
+  DEFAULT_EXPIRY_HOURS: 1,
+} as const;
+
+export const GOVERNANCE_DEFAULTS = {
+  SYNC_BATCH_SIZE: 50,
+  PROPOSAL_FETCH_LIMIT: 100,
+  VOTE_FETCH_LIMIT: 500,
+  FETCH_TIMEOUT_MS: 10_000,
+} as const;
+
+export const DELEGATION_DEFAULTS = {
+  SNAPSHOT_TOP_DELEGATORS: 10,
+  DELEGATION_FETCH_LIMIT: 500,
+  FETCH_TIMEOUT_MS: 10_000,
 } as const;

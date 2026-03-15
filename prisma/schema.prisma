@@ -23,6 +23,7 @@ model Validator {
   lastUpdated      DateTime            @updatedAt
   snapshots        ValidatorSnapshot[]
   scores           ValidatorScore[]
+  delegationSnapshots DelegationSnapshot[]
 
   @@index([status])
   @@index([jailed])
@@ -110,6 +111,7 @@ model ValidatorScore {
   jailPenalty     Float
   stakeStability  Float
   commissionScore Float
+  governanceScore Float     @default(0)
   timestamp       DateTime  @default(now())
 
   @@index([validatorId, timestamp])
@@ -146,6 +148,7 @@ model Workspace {
   webhooks       Webhook[]
   slos           Slo[]
   incidents      Incident[]
+  policies       Policy[]
 
   @@index([slug])
 }
@@ -281,4 +284,120 @@ model IncidentEvent {
 
   @@index([incidentId, createdAt])
   @@index([createdAt])
+}
+
+model Policy {
+  id              String            @id @default(cuid())
+  workspaceId     String
+  workspace       Workspace         @relation(fields: [workspaceId], references: [id])
+  name            String
+  description     String?
+  isActive        Boolean           @default(true)
+  dryRun          Boolean           @default(true)
+  priority        Int               @default(100)
+  conditions      String
+  actions         String
+  cooldownMinutes Int               @default(15)
+  lastTriggeredAt DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  executions      PolicyExecution[]
+
+  @@index([workspaceId])
+  @@index([isActive, priority])
+}
+
+model PolicyExecution {
+  id              String   @id @default(cuid())
+  policyId        String
+  policy          Policy   @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  triggerEntity   String
+  conditionsMet   String
+  actionsTaken    String
+  actionsResults  String
+  dryRun          Boolean  @default(false)
+  timestamp       DateTime @default(now())
+
+  @@index([policyId, timestamp])
+}
+
+model ActionRecord {
+  id            String    @id @default(cuid())
+  workspaceId   String
+  policyId      String?
+  actionType    String
+  entityType    String
+  entityId      String
+  rollbackData  String?
+  appliedAt     DateTime  @default(now())
+  expiresAt     DateTime
+  rolledBackAt  DateTime?
+
+  @@index([workspaceId, appliedAt])
+  @@index([expiresAt, rolledBackAt])
+  @@index([entityType, entityId])
+}
+
+model GovernanceProposal {
+  id              String            @id
+  title           String
+  description     String?
+  status          String
+  proposer        String?
+  submitTime      DateTime?
+  votingStartTime DateTime?
+  votingEndTime   DateTime?
+  yesVotes        String            @default("0")
+  noVotes         String            @default("0")
+  abstainVotes    String            @default("0")
+  vetoVotes       String            @default("0")
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  votes           GovernanceVote[]
+
+  @@index([status])
+  @@index([votingEndTime])
+}
+
+model GovernanceVote {
+  id         String             @id @default(cuid())
+  proposalId String
+  proposal   GovernanceProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  voter      String
+  option     String
+  votedAt    DateTime?
+  createdAt  DateTime           @default(now())
+
+  @@unique([proposalId, voter])
+  @@index([voter])
+}
+
+model DelegationEvent {
+  id            String   @id @default(cuid())
+  type          String
+  delegator     String
+  validatorFrom String?
+  validatorTo   String
+  amount        String
+  txHash        String?
+  blockHeight   String?
+  timestamp     DateTime @default(now())
+
+  @@index([validatorTo, timestamp])
+  @@index([validatorFrom, timestamp])
+  @@index([delegator])
+  @@index([type, timestamp])
+}
+
+model DelegationSnapshot {
+  id             String   @id @default(cuid())
+  validatorId    String
+  validator      Validator @relation(fields: [validatorId], references: [id], onDelete: Cascade)
+  totalDelegators Int
+  totalDelegated  String
+  topDelegators   String
+  churnRate       Float
+  timestamp       DateTime @default(now())
+
+  @@index([validatorId, timestamp])
 }

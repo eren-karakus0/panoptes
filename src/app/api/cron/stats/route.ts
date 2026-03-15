@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateCronAuth } from "@/lib/cron-auth";
 import { withRateLimit } from "@/lib/api-helpers";
-import { aggregateStats } from "@/lib/indexer";
-import { computeEndpointScores, computeValidatorScores, detectAnomalies, evaluateSlos, correlateIncidents } from "@/lib/intelligence";
+import { aggregateStats, syncGovernance, syncDelegations } from "@/lib/indexer";
+import { computeEndpointScores, computeValidatorScores, detectAnomalies, evaluateSlos, correlateIncidents, evaluatePolicies, detectWhaleMovement } from "@/lib/intelligence";
 
 type StepError = { step: string; error: string };
 
@@ -35,14 +35,22 @@ export async function POST(request: NextRequest) {
     runStep("detectAnomalies", detectAnomalies, errors),
   ]);
 
+  const [governanceResults, delegationResults] = await Promise.all([
+    runStep("syncGovernance", syncGovernance, errors),
+    runStep("syncDelegations", syncDelegations, errors),
+  ]);
+
+  const whaleResults = await runStep("detectWhaleMovement", detectWhaleMovement, errors);
+
   const sloResults = await runStep("evaluateSlos", evaluateSlos, errors);
+  const policyResults = await runStep("evaluatePolicies", evaluatePolicies, errors);
   const incidentResults = await runStep("correlateIncidents", correlateIncidents, errors);
 
   const status = errors.length === 0 ? 200 : 207;
 
   return NextResponse.json({
     success: errors.length === 0,
-    partial: errors.length > 0 && errors.length < 6,
+    partial: errors.length > 0 && errors.length < 10,
     ...(stats ?? {}),
     scoring: {
       endpoints: endpointScores?.scored ?? 0,
@@ -57,6 +65,21 @@ export async function POST(request: NextRequest) {
       breached: sloResults?.breached ?? 0,
       recovered: sloResults?.recovered ?? 0,
       exhausted: sloResults?.exhausted ?? 0,
+    },
+    governance: {
+      proposalsSynced: governanceResults?.proposalsSynced ?? 0,
+      votesSynced: governanceResults?.votesSynced ?? 0,
+    },
+    delegations: {
+      eventsSynced: delegationResults?.eventsSynced ?? 0,
+      snapshotsTaken: delegationResults?.snapshotsTaken ?? 0,
+      whalesDetected: whaleResults?.detected ?? 0,
+    },
+    policies: {
+      evaluated: policyResults?.evaluated ?? 0,
+      triggered: policyResults?.triggered ?? 0,
+      actionsExecuted: policyResults?.actionsExecuted ?? 0,
+      rolledBack: policyResults?.rolledBack ?? 0,
     },
     incidents: {
       created: incidentResults?.created ?? 0,

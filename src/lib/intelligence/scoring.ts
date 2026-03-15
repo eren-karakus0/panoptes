@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { SCORING, HEALTH_THRESHOLDS } from "@/lib/constants";
+import { computeGovernanceWeight } from "./governance-scoring";
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
@@ -171,13 +172,39 @@ export async function computeValidatorScores(): Promise<{ scored: number; durati
     // Commission score: lower commission = higher score
     const commissionScore = 1 - clamp(val.commission / 0.20, 0, 1);
 
+    // Governance score: participation in governance proposals
+    let governanceScore = 0;
+    try {
+      const totalProposals = await prisma.governanceProposal.count({
+        where: {
+          status: {
+            in: [
+              "PROPOSAL_STATUS_PASSED",
+              "PROPOSAL_STATUS_REJECTED",
+              "PROPOSAL_STATUS_FAILED",
+              "PROPOSAL_STATUS_VOTING_PERIOD",
+            ],
+          },
+        },
+      });
+      if (totalProposals > 0) {
+        const votesCount = await prisma.governanceVote.count({
+          where: { voter: val.id },
+        });
+        governanceScore = computeGovernanceWeight(votesCount / totalProposals);
+      }
+    } catch {
+      // Non-fatal: if governance tables don't exist or have issues, skip
+    }
+
     // Composite score
     const w = SCORING.VALIDATOR_WEIGHTS;
     const rawScore = (
       missedBlockRate * w.missedBlockRate +
       jailPenalty * w.jailPenalty +
       stakeStability * w.stakeStability +
-      commissionScore * w.commissionScore
+      commissionScore * w.commissionScore +
+      governanceScore * w.governanceScore
     ) * 100;
 
     // EMA smoothing
@@ -192,6 +219,7 @@ export async function computeValidatorScores(): Promise<{ scored: number; durati
         jailPenalty,
         stakeStability,
         commissionScore,
+        governanceScore,
       },
     });
     scored++;

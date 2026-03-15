@@ -1,11 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createHash, timingSafeEqual } from "crypto";
+import { createHash, timingSafeEqual, randomBytes } from "crypto";
 import { prisma } from "@/lib/db";
 
 export interface WorkspaceContext {
   id: string;
   name: string;
   slug: string;
+}
+
+/**
+ * Generate a new workspace token with ws_ prefix.
+ */
+export function generateWorkspaceToken(): string {
+  return `ws_${randomBytes(32).toString("hex")}`;
 }
 
 /**
